@@ -1,0 +1,20 @@
+{
+  "expo": {
+   "name": "cruzat-shanaczane-react-native-navigation",
+    "slug": "cruzat-shanaczane-react-native-navigation",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "splash": {
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {}
+  }
+}

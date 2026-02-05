@@ -1,0 +1,201 @@
+// src/screens/ProductDetailScreen/ProductDetailScreen.tsx
+
+import React, { useState } from "react";
+import {
+  View,
+  ScrollView,
+  Text,
+  Image,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useTheme } from "../../context/ThemeContext";
+import { useCart } from "../../context/CartContext";
+import { Header } from "../../components/Header/Header";
+import { createStyles } from "./ProductDetailScreen.styles";
+import { RootStackParamList } from "../../types";
+
+type ProductDetailScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "ProductDetail"
+>;
+
+type ProductDetailScreenRouteProp = RouteProp<
+  RootStackParamList,
+  "ProductDetail"
+>;
+
+export default function ProductDetailScreen() {
+  const navigation = useNavigation<ProductDetailScreenNavigationProp>();
+  const route = useRoute<ProductDetailScreenRouteProp>();
+  const { colors } = useTheme();
+  const { addToCart, getProductStock } = useCart();
+  const styles = createStyles(colors);
+
+  const product = route.params?.product;
+  const [quantity, setQuantity] = useState(1);
+
+  if (!product) {
+    Alert.alert("Error", "Product not found");
+    navigation.goBack();
+    return null;
+  }
+
+  const availableStock = getProductStock(product.id);
+  const isEmoji = typeof product.image === "string";
+
+  const handleAddToCart = () => {
+    if (availableStock === 0) {
+      Alert.alert("Out of Stock", "This item is currently out of stock.");
+      return;
+    }
+
+    if (quantity > availableStock) {
+      Alert.alert(
+        "Insufficient Stock",
+        `Only ${availableStock} items available.`,
+      );
+      return;
+    }
+
+    for (let i = 0; i < quantity; i++) {
+      addToCart(product);
+    }
+
+    Alert.alert("Added to Cart", `${quantity} item(s) added to your cart!`, [
+      {
+        text: "Continue Shopping",
+        onPress: () => {
+          setQuantity(1);
+        },
+      },
+      {
+        text: "Go to Cart",
+        onPress: () => navigation.navigate("Cart"),
+      },
+    ]);
+  };
+
+  const incrementQuantity = () => {
+    if (quantity < availableStock && quantity < 99) {
+      setQuantity(quantity + 1);
+    } else if (quantity >= availableStock) {
+      Alert.alert(
+        "Stock Limit",
+        `Only ${availableStock} items available in stock.`,
+      );
+    }
+  };
+
+  const decrementQuantity = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Header title="Product Details" showBack={true} showCart={true} />
+      <ScrollView
+        style={styles.content}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.imageContainer}>
+          {isEmoji ? (
+            <Text style={styles.imageText}>{product.image}</Text>
+          ) : (
+            <Image
+              source={product.image}
+              style={styles.productImage}
+              resizeMode="contain"
+            />
+          )}
+        </View>
+
+        <View style={styles.infoSection}>
+          <Text style={styles.productName}>{product.name}</Text>
+          <Text style={styles.productPrice}>
+            ₱{product.price.toLocaleString()}
+          </Text>
+
+          <View style={styles.stockContainer}>
+            <Text style={styles.stockLabel}>Availability:</Text>
+            <Text
+              style={[
+                styles.stockValue,
+                availableStock === 0 && styles.outOfStock,
+                availableStock > 0 && availableStock <= 5 && styles.lowStock,
+              ]}
+            >
+              {availableStock === 0
+                ? "Out of Stock"
+                : `${availableStock} in stock`}
+            </Text>
+          </View>
+
+          <View style={styles.divider} />
+
+          <Text style={styles.sectionTitle}>Description</Text>
+          <Text style={styles.description}>{product.description}</Text>
+
+          {product.longDescription && (
+            <>
+              <Text style={styles.longDescription}>
+                {product.longDescription}
+              </Text>
+            </>
+          )}
+
+          <View style={styles.divider} />
+
+          <Text style={styles.sectionTitle}>Quantity</Text>
+          <View style={styles.quantityContainer}>
+            <TouchableOpacity
+              style={styles.quantityButton}
+              onPress={decrementQuantity}
+              disabled={quantity <= 1}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.quantityButtonText}>-</Text>
+            </TouchableOpacity>
+            <Text style={styles.quantityText}>{quantity}</Text>
+            <TouchableOpacity
+              style={styles.quantityButton}
+              onPress={incrementQuantity}
+              disabled={quantity >= availableStock || availableStock === 0}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.quantityButtonText}>+</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.totalContainer}>
+            <Text style={styles.totalLabel}>Total:</Text>
+            <Text style={styles.totalValue}>
+              ₱{(product.price * quantity).toLocaleString()}
+            </Text>
+          </View>
+        </View>
+      </ScrollView>
+
+      <View style={styles.bottomContainer}>
+        <TouchableOpacity
+          style={[
+            styles.addButton,
+            availableStock === 0 && styles.disabledButton,
+          ]}
+          onPress={handleAddToCart}
+          activeOpacity={0.8}
+          disabled={availableStock === 0}
+        >
+          <Text style={styles.addButtonText}>
+            {availableStock === 0 ? "Out of Stock" : "Add to Cart"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
