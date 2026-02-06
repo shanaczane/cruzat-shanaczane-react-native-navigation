@@ -42,8 +42,8 @@ export interface CartContextType {
   getCartTotal: () => number;
   getCartItemsCount: () => number;
   getProductStock: (productId: string) => number;
+  completePurchase: () => void; // NEW
 }
-
 
 export type RootStackParamList = {
   Home: undefined;
