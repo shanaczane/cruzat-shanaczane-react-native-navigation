@@ -1,6 +1,6 @@
 // src/screens/CheckoutScreen/CheckoutScreen.tsx
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   ScrollView,
@@ -9,14 +9,17 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, CommonActions } from "@react-navigation/native";
 import { useTheme } from "../../context/ThemeContext";
 import { useCart } from "../../context/CartContext";
 import { Header } from "../../components/Header/Header";
 import { createStyles } from "./CheckoutScreen.styles";
+import { CheckoutScreenProps } from "../../types";
 
-export default function CheckoutScreen() {
-  const navigation = useNavigation();
+export default function CheckoutScreen({
+  navigation,
+  route,
+}: CheckoutScreenProps) {
   const { colors } = useTheme();
   const {
     cartItems,
@@ -35,15 +38,30 @@ export default function CheckoutScreen() {
   const total = subtotal + tax + shipping;
   const itemsCount = getCartItemsCount();
 
-  useEffect(() => {
-    if (cartItems.length === 0) {
-      navigation.navigate("Home" as never);
-    }
-  }, [cartItems.length, navigation]);
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log("Checkout screen focused");
+
+      if (cartItems.length === 0) {
+        Alert.alert(
+          "Cannot Access Checkout",
+          "You must add items to cart first before checking out.",
+          [
+            {
+              text: "OK",
+              onPress: () => {
+                navigation.replace("Home");
+              },
+            },
+          ],
+        );
+      }
+    }, [cartItems.length, navigation]),
+  );
 
   const handleCheckout = () => {
     if (cartItems.length === 0) {
-      navigation.navigate("Home" as never);
+      navigation.replace("Home");
       return;
     }
 
@@ -63,6 +81,7 @@ export default function CheckoutScreen() {
     setTimeout(() => {
       setIsProcessing(false);
 
+      // Complete the purchase
       completePurchase();
 
       Alert.alert(
@@ -73,7 +92,14 @@ export default function CheckoutScreen() {
             text: "OK",
             onPress: () => {
               clearCart();
-              navigation.navigate("Home" as never);
+
+              // Use RESET navigation (professor's requirement!)
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [{ name: "Home" }],
+                }),
+              );
             },
           },
         ],
