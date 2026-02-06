@@ -1,5 +1,8 @@
 // src/types/index.ts
 
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RouteProp } from "@react-navigation/native";
+
 export interface Product {
   id: string;
   name: string;
@@ -42,12 +45,34 @@ export interface CartContextType {
   getCartTotal: () => number;
   getCartItemsCount: () => number;
   getProductStock: (productId: string) => number;
-  completePurchase: () => void; // NEW
+  completePurchase: () => void;
 }
+
 
 export type RootStackParamList = {
   Home: undefined;
   ProductDetail: { product: Product };
   Cart: undefined;
   Checkout: undefined;
+};
+
+
+export type HomeScreenProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, "Home">;
+  route: RouteProp<RootStackParamList, "Home">;
+};
+
+export type ProductDetailScreenProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, "ProductDetail">;
+  route: RouteProp<RootStackParamList, "ProductDetail">;
+};
+
+export type CartScreenProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, "Cart">;
+  route: RouteProp<RootStackParamList, "Cart">;
+};
+
+export type CheckoutScreenProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, "Checkout">;
+  route: RouteProp<RootStackParamList, "Checkout">;
 };
