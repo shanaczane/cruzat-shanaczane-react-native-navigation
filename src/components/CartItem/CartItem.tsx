@@ -26,21 +26,8 @@ export const CartItem: React.FC<CartItemProps> = ({ item }) => {
   };
 
   const handleDecrement = () => {
-    if (item.quantity > 1) {
-      updateQuantity(item.id, item.quantity - 1);
-    } else {
-      Alert.alert("Remove Item", "Do you want to remove this item from cart?", [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Remove",
-          onPress: () => removeFromCart(item.id),
-          style: "destructive",
-        },
-      ]);
-    }
+    // Directly decrease quantity (will be removed if it reaches 0)
+    updateQuantity(item.id, item.quantity - 1);
   };
 
   const handleRemove = () => {
