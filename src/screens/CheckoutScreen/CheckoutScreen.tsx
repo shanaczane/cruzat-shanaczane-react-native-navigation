@@ -18,7 +18,13 @@ import { createStyles } from "./CheckoutScreen.styles";
 export default function CheckoutScreen() {
   const navigation = useNavigation();
   const { colors } = useTheme();
-  const { cartItems, getCartTotal, getCartItemsCount, clearCart } = useCart();
+  const {
+    cartItems,
+    getCartTotal,
+    getCartItemsCount,
+    clearCart,
+    completePurchase,
+  } = useCart();
   const styles = createStyles(colors);
 
   const [isProcessing, setIsProcessing] = useState(false);
@@ -56,6 +62,8 @@ export default function CheckoutScreen() {
 
     setTimeout(() => {
       setIsProcessing(false);
+
+      completePurchase();
 
       Alert.alert(
         "Checkout Successful! ✅",
