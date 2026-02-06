@@ -1,26 +1,34 @@
 // src/screens/HomeScreen/HomeScreen.tsx
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { View, ScrollView, Text, ActivityIndicator } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import { useTheme } from "../../context/ThemeContext";
 import { Header } from "../../components/Header/Header";
 import { ProductCard } from "../../components/ProductCard/ProductCard";
 import { PRODUCTS } from "../../constants/products";
 import { createStyles } from "./HomeScreen.styles";
+import { HomeScreenProps } from "../../types";
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation, route }: HomeScreenProps) {
   const { colors } = useTheme();
   const styles = createStyles(colors);
 
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log("Home screen focused");
+      
+      setIsLoading(true);
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
 
-    return () => clearTimeout(timer);
-  }, []);
+      return () => clearTimeout(timer);
+    }, []),
+  );
 
   if (isLoading) {
     return (
