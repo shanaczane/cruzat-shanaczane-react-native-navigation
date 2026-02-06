@@ -28,6 +28,14 @@ export const createStyles = (colors: ThemeColors) =>
       marginRight: 12,
       backgroundColor: "#f0f0f0",
     },
+    imageText: {
+      fontSize: 40,
+      textAlign: "center",
+      width: "100%",
+      height: "100%",
+      lineHeight: 80,
+      color: colors.text,
+    },
     productImage: {
       width: "100%",
       height: "100%",
