@@ -6,7 +6,7 @@ import {
   ScrollView,
   Text,
   Image,
-  TouchableOpacity,
+  Pressable,
   Alert,
 } from "react-native";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
@@ -17,12 +17,12 @@ import { Header } from "../../components/Header/Header";
 import { createStyles } from "./ProductDetailScreen.styles";
 import { RootStackParamList } from "../../types";
 
-type ProductDetailScreenNavigationProp = NativeStackNavigationProp<
+type ProductDetailScreenNavigationProp = NativeStackNavigationProp <
   RootStackParamList,
   "ProductDetail"
 >;
 
-type ProductDetailScreenRouteProp = RouteProp<
+type ProductDetailScreenRouteProp = RouteProp <
   RootStackParamList,
   "ProductDetail"
 >;
@@ -55,7 +55,7 @@ export default function ProductDetailScreen() {
     if (quantity > availableStock) {
       Alert.alert(
         "Insufficient Stock",
-        `Only ${availableStock} items available.`,
+        `Only ${availableStock} items available.`
       );
       return;
     }
@@ -84,7 +84,7 @@ export default function ProductDetailScreen() {
     } else if (quantity >= availableStock) {
       Alert.alert(
         "Stock Limit",
-        `Only ${availableStock} items available in stock.`,
+        `Only ${availableStock} items available in stock.`
       );
     }
   };
@@ -127,7 +127,9 @@ export default function ProductDetailScreen() {
               style={[
                 styles.stockValue,
                 availableStock === 0 && styles.outOfStock,
-                availableStock > 0 && availableStock <= 5 && styles.lowStock,
+                availableStock > 0 &&
+                  availableStock <= 5 &&
+                  styles.lowStock,
               ]}
             >
               {availableStock === 0
@@ -153,23 +155,27 @@ export default function ProductDetailScreen() {
 
           <Text style={styles.sectionTitle}>Quantity</Text>
           <View style={styles.quantityContainer}>
-            <TouchableOpacity
-              style={styles.quantityButton}
+            <Pressable
+              style={({ pressed }) => [
+                styles.quantityButton,
+                (pressed || quantity <= 1) && { opacity: 0.7 },
+              ]}
               onPress={decrementQuantity}
               disabled={quantity <= 1}
-              activeOpacity={0.7}
             >
               <Text style={styles.quantityButtonText}>-</Text>
-            </TouchableOpacity>
+            </Pressable>
             <Text style={styles.quantityText}>{quantity}</Text>
-            <TouchableOpacity
-              style={styles.quantityButton}
+            <Pressable
+              style={({ pressed }) => [
+                styles.quantityButton,
+                (pressed || quantity >= availableStock || availableStock === 0) && { opacity: 0.7 },
+              ]}
               onPress={incrementQuantity}
               disabled={quantity >= availableStock || availableStock === 0}
-              activeOpacity={0.7}
             >
               <Text style={styles.quantityButtonText}>+</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           <View style={styles.totalContainer}>
@@ -182,19 +188,19 @@ export default function ProductDetailScreen() {
       </ScrollView>
 
       <View style={styles.bottomContainer}>
-        <TouchableOpacity
-          style={[
+        <Pressable
+          style={({ pressed }) => [
             styles.addButton,
             availableStock === 0 && styles.disabledButton,
+            pressed && availableStock > 0 && { opacity: 0.8 },
           ]}
           onPress={handleAddToCart}
-          activeOpacity={0.8}
           disabled={availableStock === 0}
         >
           <Text style={styles.addButtonText}>
             {availableStock === 0 ? "Out of Stock" : "Add to Cart"}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );

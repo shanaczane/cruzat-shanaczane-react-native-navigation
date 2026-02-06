@@ -1,11 +1,11 @@
 // src/screens/CheckoutScreen/CheckoutScreen.tsx
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   ScrollView,
   Text,
-  TouchableOpacity,
+  Pressable,
   Alert,
   ActivityIndicator,
 } from "react-native";
@@ -28,6 +28,12 @@ export default function CheckoutScreen() {
   const shipping = subtotal > 5000 ? 0 : 150;
   const total = subtotal + tax + shipping;
   const itemsCount = getCartItemsCount();
+
+  useEffect(() => {
+    if (cartItems.length === 0) {
+      navigation.navigate("Home" as never);
+    }
+  }, [cartItems.length, navigation]);
 
   const handleCheckout = () => {
     if (cartItems.length === 0) {
@@ -87,7 +93,6 @@ export default function CheckoutScreen() {
   };
 
   if (cartItems.length === 0) {
-    navigation.navigate("Home" as never);
     return null;
   }
 
@@ -162,10 +167,12 @@ export default function CheckoutScreen() {
       </View>
 
       <View style={styles.bottomContainer}>
-        <TouchableOpacity
-          style={styles.checkoutButton}
+        <Pressable
+          style={({ pressed }) => [
+            styles.checkoutButton,
+            pressed && !isProcessing && { opacity: 0.8 },
+          ]}
           onPress={handleCheckout}
-          activeOpacity={0.8}
           disabled={isProcessing}
         >
           {isProcessing ? (
@@ -175,15 +182,17 @@ export default function CheckoutScreen() {
               Complete Checkout - ₱{total.toLocaleString()}
             </Text>
           )}
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.cancelButton}
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [
+            styles.cancelButton,
+            pressed && !isProcessing && { opacity: 0.8 },
+          ]}
           onPress={handleCancel}
-          activeOpacity={0.8}
           disabled={isProcessing}
         >
           <Text style={styles.cancelButtonText}>Cancel</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );

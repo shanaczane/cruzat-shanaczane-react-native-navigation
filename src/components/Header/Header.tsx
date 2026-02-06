@@ -1,7 +1,7 @@
 // src/components/Header/Header.tsx
 
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../../context/ThemeContext";
 import { useCart } from "../../context/CartContext";
@@ -15,8 +15,8 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   title,
-  showBack = false, 
-  showCart = false, 
+  showBack = false,
+  showCart = false,
 }) => {
   const navigation = useNavigation();
   const { colors, isDarkMode, toggleTheme } = useTheme();
@@ -25,7 +25,6 @@ export const Header: React.FC<HeaderProps> = ({
 
   const cartItemsCount = getCartItemsCount();
 
- 
   const shouldShowBack = Boolean(showBack);
   const shouldShowCart = Boolean(showCart);
 
@@ -34,27 +33,39 @@ export const Header: React.FC<HeaderProps> = ({
       <View style={styles.headerContent}>
         <View style={styles.titleContainer}>
           {shouldShowBack && (
-            <TouchableOpacity
-              style={styles.backButton}
+            <Pressable
+              style={({ pressed }) => [
+                styles.backButton,
+                pressed && { opacity: 0.7 },
+              ]}
               onPress={() => navigation.goBack()}
             >
               <Text style={styles.backButtonText}>←</Text>
-            </TouchableOpacity>
+            </Pressable>
           )}
           <Text style={styles.title}>{title}</Text>
         </View>
         <View style={styles.rightContainer}>
-          <TouchableOpacity style={styles.themeButton} onPress={toggleTheme}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.themeButton,
+              pressed && { opacity: 0.7 },
+            ]}
+            onPress={toggleTheme}
+          >
             <Text style={styles.themeIcon}>{isDarkMode ? "☀️" : "🌙"}</Text>
-          </TouchableOpacity>
+          </Pressable>
           {shouldShowCart && (
             <View style={styles.cartBadgeContainer}>
-              <TouchableOpacity
-                style={styles.cartButton}
+              <Pressable
+                style={({ pressed }) => [
+                  styles.cartButton,
+                  pressed && { opacity: 0.7 },
+                ]}
                 onPress={() => navigation.navigate("Cart" as never)}
               >
                 <Text style={styles.cartIcon}>🛒</Text>
-              </TouchableOpacity>
+              </Pressable>
               {cartItemsCount > 0 && (
                 <View style={styles.badge}>
                   <Text style={styles.badgeText}>{cartItemsCount}</Text>

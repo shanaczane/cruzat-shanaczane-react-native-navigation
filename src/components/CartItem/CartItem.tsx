@@ -1,7 +1,7 @@
 // src/components/CartItem/CartItem.tsx
 
 import React from "react";
-import { View, Text, TouchableOpacity, Alert, Image } from "react-native";
+import { View, Text, Pressable, Alert, Image } from "react-native";
 import { CartItem as CartItemType } from "../../types";
 import { useTheme } from "../../context/ThemeContext";
 import { useCart } from "../../context/CartContext";
@@ -15,6 +15,7 @@ export const CartItem: React.FC<CartItemProps> = ({ item }) => {
   const { colors } = useTheme();
   const { updateQuantity, removeFromCart } = useCart();
   const styles = createStyles(colors);
+  const isEmoji = typeof item.image === "string";
 
   const handleIncrement = () => {
     if (item.quantity >= 99) {
@@ -66,11 +67,15 @@ export const CartItem: React.FC<CartItemProps> = ({ item }) => {
     <View style={styles.card}>
       <View style={styles.cardContent}>
         <View style={styles.imageContainer}>
-          <Image
-            source={item.image}
-            style={styles.productImage}
-            resizeMode="cover"
-          />
+          {isEmoji ? (
+            <Text style={styles.imageText}>{item.image}</Text>
+          ) : (
+            <Image
+              source={item.image}
+              style={styles.productImage}
+              resizeMode="cover"
+            />
+          )}
         </View>
         <View style={styles.infoContainer}>
           <Text style={styles.productName}>{item.name}</Text>
@@ -84,29 +89,35 @@ export const CartItem: React.FC<CartItemProps> = ({ item }) => {
       </View>
       <View style={styles.controlsContainer}>
         <View style={styles.quantityContainer}>
-          <TouchableOpacity
-            style={styles.quantityButton}
+          <Pressable
+            style={({ pressed }) => [
+              styles.quantityButton,
+              pressed && { opacity: 0.7 },
+            ]}
             onPress={handleDecrement}
-            activeOpacity={0.7}
           >
             <Text style={styles.quantityButtonText}>-</Text>
-          </TouchableOpacity>
+          </Pressable>
           <Text style={styles.quantityText}>{item.quantity}</Text>
-          <TouchableOpacity
-            style={styles.quantityButton}
+          <Pressable
+            style={({ pressed }) => [
+              styles.quantityButton,
+              pressed && { opacity: 0.7 },
+            ]}
             onPress={handleIncrement}
-            activeOpacity={0.7}
           >
             <Text style={styles.quantityButtonText}>+</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
-        <TouchableOpacity
-          style={styles.removeButton}
+        <Pressable
+          style={({ pressed }) => [
+            styles.removeButton,
+            pressed && { opacity: 0.7 },
+          ]}
           onPress={handleRemove}
-          activeOpacity={0.7}
         >
           <Text style={styles.removeButtonText}>Remove</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );

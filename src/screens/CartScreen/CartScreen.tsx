@@ -1,7 +1,7 @@
 // src/screens/CartScreen/CartScreen.tsx
 
 import React from "react";
-import { View, ScrollView, Text, TouchableOpacity, Alert } from "react-native";
+import { View, ScrollView, Text, Pressable, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../../context/ThemeContext";
 import { useCart } from "../../context/CartContext";
@@ -63,7 +63,6 @@ export default function CartScreen() {
     navigation.navigate("Home" as never);
   };
 
-  
   if (cartItems.length === 0) {
     return (
       <View style={styles.container}>
@@ -74,13 +73,15 @@ export default function CartScreen() {
           <Text style={styles.emptyText}>
             Add some PS5 games to your cart to get started
           </Text>
-          <TouchableOpacity
-            style={styles.shopButton}
+          <Pressable
+            style={({ pressed }) => [
+              styles.shopButton,
+              pressed && { opacity: 0.8 },
+            ]}
             onPress={handleContinueShopping}
-            activeOpacity={0.8}
           >
             <Text style={styles.shopButtonText}>Continue Shopping</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     );
@@ -116,20 +117,24 @@ export default function CartScreen() {
             <Text style={styles.totalValue}>₱{total.toLocaleString()}</Text>
           </View>
         </View>
-        <TouchableOpacity
-          style={styles.checkoutButton}
+        <Pressable
+          style={({ pressed }) => [
+            styles.checkoutButton,
+            pressed && { opacity: 0.8 },
+          ]}
           onPress={handleCheckout}
-          activeOpacity={0.8}
         >
           <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.clearButton}
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [
+            styles.clearButton,
+            pressed && { opacity: 0.8 },
+          ]}
           onPress={handleClearCart}
-          activeOpacity={0.8}
         >
           <Text style={styles.clearButtonText}>Clear Cart</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );
