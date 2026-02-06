@@ -2,21 +2,27 @@
 
 import React from "react";
 import { View, ScrollView, Text, Pressable, Alert } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import { useTheme } from "../../context/ThemeContext";
 import { useCart } from "../../context/CartContext";
 import { Header } from "../../components/Header/Header";
 import { CartItem } from "../../components/CartItem/CartItem";
 import { createStyles } from "./CartScreen.styles";
+import { CartScreenProps } from "../../types";
 
-export default function CartScreen() {
-  const navigation = useNavigation();
+export default function CartScreen({ navigation, route }: CartScreenProps) {
   const { colors } = useTheme();
   const { cartItems, getCartTotal, getCartItemsCount, clearCart } = useCart();
   const styles = createStyles(colors);
 
   const total = getCartTotal();
   const itemsCount = getCartItemsCount();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log("Cart screen focused - items:", cartItems.length);
+    }, [cartItems]),
+  );
 
   const handleCheckout = () => {
     if (cartItems.length === 0) {
@@ -32,7 +38,7 @@ export default function CartScreen() {
       return;
     }
 
-    navigation.navigate("Checkout" as never);
+    navigation.push("Checkout");
   };
 
   const handleClearCart = () => {
@@ -60,7 +66,7 @@ export default function CartScreen() {
   };
 
   const handleContinueShopping = () => {
-    navigation.navigate("Home" as never);
+    navigation.goBack();
   };
 
   if (cartItems.length === 0) {
