@@ -21,6 +21,8 @@ interface CartProviderProps {
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  // Track actual stock after purchases (productId -> remaining stock)
+  const [stockLevels, setStockLevels] = useState<{ [key: string]: number }>({});
 
   const validateProduct = (product: Product): boolean => {
     if (!product || !product.id || !product.name || product.price <= 0) {
@@ -42,14 +44,22 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     return true;
   };
 
-  const getProductStock = (productId: string): number => {
+  const getActualStock = (productId: string): number => {
     const product = PRODUCTS.find((p) => p.id === productId);
     if (!product) return 0;
 
+    // Get remaining stock after purchases (or use original stock if never purchased)
+    const remainingStock = stockLevels[productId] ?? product.stock;
+    return remainingStock;
+  };
+
+  const getProductStock = (productId: string): number => {
+    const actualStock = getActualStock(productId);
     const cartItem = cartItems.find((item) => item.id === productId);
     const inCartQuantity = cartItem ? cartItem.quantity : 0;
 
-    return product.stock - inCartQuantity;
+    // Available stock = actual stock - items currently in cart
+    return actualStock - inCartQuantity;
   };
 
   const addToCart = (product: Product) => {
@@ -63,7 +73,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         const availableStock = getProductStock(product.id);
 
         if (existingItem) {
-          // Check stock before adding
           if (availableStock <= 0) {
             Alert.alert("Out of Stock", "This item is currently out of stock.");
             return prevItems;
@@ -81,7 +90,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
           );
         }
 
-        // check stock
         if (availableStock <= 0) {
           Alert.alert("Out of Stock", "This item is currently out of stock.");
           return prevItems;
@@ -122,17 +130,18 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         return;
       }
 
+      // If quantity is 0, remove the item
       if (quantity === 0) {
         removeFromCart(productId);
         return;
       }
 
       // Check stock before updating
-      const product = PRODUCTS.find((p) => p.id === productId);
-      if (product && quantity > product.stock) {
+      const actualStock = getActualStock(productId);
+      if (quantity > actualStock) {
         Alert.alert(
           "Insufficient Stock",
-          `Only ${product.stock} items available in stock.`,
+          `Only ${actualStock} items available in stock.`,
         );
         return;
       }
@@ -145,6 +154,22 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     } catch (error) {
       Alert.alert("Error", "Failed to update quantity");
       console.error("Update quantity error:", error);
+    }
+  };
+
+  const completePurchase = () => {
+    try {
+      // Reduce actual stock based on purchased items
+      const newStockLevels = { ...stockLevels };
+
+      cartItems.forEach((item) => {
+        const currentStock = getActualStock(item.id);
+        newStockLevels[item.id] = currentStock - item.quantity;
+      });
+
+      setStockLevels(newStockLevels);
+    } catch (error) {
+      console.error("Complete purchase error:", error);
     }
   };
 
@@ -187,6 +212,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     getCartTotal,
     getCartItemsCount,
     getProductStock,
+    completePurchase,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
