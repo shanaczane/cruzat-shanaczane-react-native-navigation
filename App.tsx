@@ -9,8 +9,9 @@ import HomeScreen from "./src/screens/HomeScreen/HomeScreen";
 import CartScreen from "./src/screens/CartScreen/CartScreen";
 import CheckoutScreen from "./src/screens/CheckoutScreen/CheckoutScreen";
 import ProductDetailScreen from "./src/screens/ProductDetailScreen/ProductDetailScreen";
+import { RootStackParamList } from "./src/types";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
